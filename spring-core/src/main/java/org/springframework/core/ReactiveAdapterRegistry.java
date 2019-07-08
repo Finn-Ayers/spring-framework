@@ -98,7 +98,7 @@ public class ReactiveAdapterRegistry {
 
 		// Coroutines
 		if (this.reactorPresent && ClassUtils.isPresent("kotlinx.coroutines.Deferred", classLoader)) {
-			new CoroutinesRegistrar().registerAdapters(this);
+			// new CoroutinesRegistrar().registerAdapters(this);
 		}
 		// TODO Use a single CoroutinesRegistrar when Flow will be not experimental anymore
 		if (this.reactorPresent && ClassUtils.isPresent("kotlinx.coroutines.flow.Flow", classLoader)) {
@@ -346,14 +346,14 @@ public class ReactiveAdapterRegistry {
 
 	private static class CoroutinesRegistrar {
 
-		@SuppressWarnings("KotlinInternalInJava")
-		void registerAdapters(ReactiveAdapterRegistry registry) {
-			registry.registerReactiveType(
-					ReactiveTypeDescriptor.singleOptionalValue(Deferred.class,
-							() -> CompletableDeferredKt.CompletableDeferred(null)),
-					source -> CoroutinesUtils.deferredToMono((Deferred<?>) source),
-					source -> CoroutinesUtils.monoToDeferred(Mono.from(source)));
-		}
+//		@SuppressWarnings("KotlinInternalInJava")
+//		void registerAdapters(ReactiveAdapterRegistry registry) {
+//			registry.registerReactiveType(
+//					ReactiveTypeDescriptor.singleOptionalValue(Deferred.class,
+//							() -> CompletableDeferredKt.CompletableDeferred(null)),
+//					source -> CoroutinesUtils.deferredToMono((Deferred<?>) source),
+//					source -> CoroutinesUtils.monoToDeferred(Mono.from(source)));
+//		}
 	}
 
 
