@@ -16,54 +16,46 @@
 
 package org.springframework.core.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.*;
+
 /**
- * {@link Resource} implementation for {@code java.net.URL} locators.
- * Supports resolution as a {@code URL} and also as a {@code File} in
- * case of the {@code "file:"} protocol.
+ * Url相关资源类,继承自AbstractFileResolvingResource,具体实现委托给父类实现
  *
- * @author Juergen Hoeller
- * @since 28.12.2003
- * @see java.net.URL
+ * @author gaoteng
+ * @create 2019-07-08 13:23
  */
 public class UrlResource extends AbstractFileResolvingResource {
 
 	/**
-	 * Original URI, if available; used for URI and File access.
+	 * 原始URI(如果有)用于URI和文件访问
 	 */
 	@Nullable
 	private final URI uri;
 
 	/**
-	 * Original URL, used for actual access.
+	 * 原始URL，用于实际访问
 	 */
 	private final URL url;
 
 	/**
-	 * Cleaned URL (with normalized path), used for comparisons.
+	 * 清理的url
 	 */
 	private final URL cleanedUrl;
 
 
 	/**
-	 * Create a new {@code UrlResource} based on the given URI object.
-	 * @param uri a URI
-	 * @throws MalformedURLException if the given URL path is not valid
-	 * @since 2.5
+	 * 根据URI创建
+	 *
+	 * @param uri
+	 * @throws MalformedURLException
 	 */
 	public UrlResource(URI uri) throws MalformedURLException {
 		Assert.notNull(uri, "URI must not be null");
@@ -73,8 +65,9 @@ public class UrlResource extends AbstractFileResolvingResource {
 	}
 
 	/**
-	 * Create a new {@code UrlResource} based on the given URL object.
-	 * @param url a URL
+	 * 根据URL创建
+	 *
+	 * @param url
 	 */
 	public UrlResource(URL url) {
 		Assert.notNull(url, "URL must not be null");
@@ -84,11 +77,10 @@ public class UrlResource extends AbstractFileResolvingResource {
 	}
 
 	/**
-	 * Create a new {@code UrlResource} based on a URL path.
-	 * <p>Note: The given path needs to be pre-encoded if necessary.
-	 * @param path a URL path
-	 * @throws MalformedURLException if the given URL path is not valid
-	 * @see java.net.URL#URL(String)
+	 * 根据字符串path创建
+	 *
+	 * @param path
+	 * @throws MalformedURLException
 	 */
 	public UrlResource(String path) throws MalformedURLException {
 		Assert.notNull(path, "Path must not be null");
@@ -98,38 +90,30 @@ public class UrlResource extends AbstractFileResolvingResource {
 	}
 
 	/**
-	 * Create a new {@code UrlResource} based on a URI specification.
-	 * <p>The given parts will automatically get encoded if necessary.
-	 * @param protocol the URL protocol to use (e.g. "jar" or "file" - without colon);
-	 * also known as "scheme"
-	 * @param location the location (e.g. the file path within that protocol);
-	 * also known as "scheme-specific part"
-	 * @throws MalformedURLException if the given URL specification is not valid
-	 * @see java.net.URI#URI(String, String, String)
+	 * 根据URL规范创建
+	 *
+	 * @param protocol
+	 * @param location
+	 * @throws MalformedURLException
 	 */
-	public UrlResource(String protocol, String location) throws MalformedURLException  {
+	public UrlResource(String protocol, String location) throws MalformedURLException {
 		this(protocol, location, null);
 	}
 
 	/**
-	 * Create a new {@code UrlResource} based on a URI specification.
-	 * <p>The given parts will automatically get encoded if necessary.
-	 * @param protocol the URL protocol to use (e.g. "jar" or "file" - without colon);
-	 * also known as "scheme"
-	 * @param location the location (e.g. the file path within that protocol);
-	 * also known as "scheme-specific part"
-	 * @param fragment the fragment within that location (e.g. anchor on an HTML page,
-	 * as following after a "#" separator)
-	 * @throws MalformedURLException if the given URL specification is not valid
-	 * @see java.net.URI#URI(String, String, String)
+	 * 根据URL规范创建
+	 *
+	 * @param protocol
+	 * @param location
+	 * @param fragment
+	 * @throws MalformedURLException
 	 */
-	public UrlResource(String protocol, String location, @Nullable String fragment) throws MalformedURLException  {
+	public UrlResource(String protocol, String location, @Nullable String fragment) throws MalformedURLException {
 		try {
 			this.uri = new URI(protocol, location, fragment);
 			this.url = this.uri.toURL();
 			this.cleanedUrl = getCleanedUrl(this.url, this.uri.toString());
-		}
-		catch (URISyntaxException ex) {
+		} catch (URISyntaxException ex) {
 			MalformedURLException exToThrow = new MalformedURLException(ex.getMessage());
 			exToThrow.initCause(ex);
 			throw exToThrow;
@@ -138,41 +122,31 @@ public class UrlResource extends AbstractFileResolvingResource {
 
 
 	/**
-	 * Determine a cleaned URL for the given original URL.
-	 * @param originalUrl the original URL
-	 * @param originalPath the original URL path
-	 * @return the cleaned URL (possibly the original URL as-is)
-	 * @see org.springframework.util.StringUtils#cleanPath
+	 * 获取原始URL的已清理URL
+	 *
+	 * @param originalUrl
+	 * @param originalPath
+	 * @return
 	 */
 	private URL getCleanedUrl(URL originalUrl, String originalPath) {
 		String cleanedPath = StringUtils.cleanPath(originalPath);
 		if (!cleanedPath.equals(originalPath)) {
 			try {
 				return new URL(cleanedPath);
-			}
-			catch (MalformedURLException ex) {
+			} catch (MalformedURLException ex) {
 				// Cleaned URL path cannot be converted to URL -> take original URL.
 			}
 		}
 		return originalUrl;
 	}
 
-	/**
-	 * This implementation opens an InputStream for the given URL.
-	 * <p>It sets the {@code useCaches} flag to {@code false},
-	 * mainly to avoid jar file locking on Windows.
-	 * @see java.net.URL#openConnection()
-	 * @see java.net.URLConnection#setUseCaches(boolean)
-	 * @see java.net.URLConnection#getInputStream()
-	 */
 	@Override
 	public InputStream getInputStream() throws IOException {
 		URLConnection con = this.url.openConnection();
 		ResourceUtils.useCachesIfNecessary(con);
 		try {
 			return con.getInputStream();
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			// Close the HTTP connection (if applicable).
 			if (con instanceof HttpURLConnection) {
 				((HttpURLConnection) con).disconnect();
@@ -182,7 +156,9 @@ public class UrlResource extends AbstractFileResolvingResource {
 	}
 
 	/**
-	 * This implementation returns the underlying URL reference.
+	 * 获取URL
+	 *
+	 * @return
 	 */
 	@Override
 	public URL getURL() {
@@ -190,48 +166,55 @@ public class UrlResource extends AbstractFileResolvingResource {
 	}
 
 	/**
-	 * This implementation returns the underlying URI directly,
-	 * if possible.
+	 * 获取URI,如果为空则从父类获取
+	 *
+	 * @return
+	 * @throws IOException
 	 */
 	@Override
 	public URI getURI() throws IOException {
 		if (this.uri != null) {
 			return this.uri;
-		}
-		else {
+		} else {
 			return super.getURI();
 		}
 	}
 
+	/**
+	 * 是否为File,如果uri为空则从父类获取
+	 *
+	 * @return
+	 */
 	@Override
 	public boolean isFile() {
 		if (this.uri != null) {
 			return super.isFile(this.uri);
-		}
-		else {
+		} else {
 			return super.isFile();
 		}
 	}
 
 	/**
-	 * This implementation returns a File reference for the underlying URL/URI,
-	 * provided that it refers to a file in the file system.
-	 * @see org.springframework.util.ResourceUtils#getFile(java.net.URL, String)
+	 * 获取File,如果为空则从父类获取
+	 *
+	 * @return
+	 * @throws IOException
 	 */
 	@Override
 	public File getFile() throws IOException {
 		if (this.uri != null) {
 			return super.getFile(this.uri);
-		}
-		else {
+		} else {
 			return super.getFile();
 		}
 	}
 
 	/**
-	 * This implementation creates a {@code UrlResource}, applying the given path
-	 * relative to the path of the underlying URL of this resource descriptor.
-	 * @see java.net.URL#URL(java.net.URL, String)
+	 * 根据relativePath创建Resource
+	 *
+	 * @param relativePath
+	 * @return
+	 * @throws MalformedURLException
 	 */
 	@Override
 	public Resource createRelative(String relativePath) throws MalformedURLException {
@@ -242,8 +225,9 @@ public class UrlResource extends AbstractFileResolvingResource {
 	}
 
 	/**
-	 * This implementation returns the name of the file that this URL refers to.
-	 * @see java.net.URL#getPath()
+	 * 获取文件名称
+	 *
+	 * @return
 	 */
 	@Override
 	public String getFilename() {
@@ -251,26 +235,21 @@ public class UrlResource extends AbstractFileResolvingResource {
 	}
 
 	/**
-	 * This implementation returns a description that includes the URL.
+	 * 获取描述
+	 *
+	 * @return
 	 */
 	@Override
 	public String getDescription() {
 		return "URL [" + this.url + "]";
 	}
 
-
-	/**
-	 * This implementation compares the underlying URL references.
-	 */
 	@Override
 	public boolean equals(@Nullable Object other) {
 		return (this == other || (other instanceof UrlResource &&
 				this.cleanedUrl.equals(((UrlResource) other).cleanedUrl)));
 	}
 
-	/**
-	 * This implementation returns the hash code of the underlying URL reference.
-	 */
 	@Override
 	public int hashCode() {
 		return this.cleanedUrl.hashCode();

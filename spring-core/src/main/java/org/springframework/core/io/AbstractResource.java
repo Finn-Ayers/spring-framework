@@ -16,6 +16,11 @@
 
 package org.springframework.core.io;
 
+import org.springframework.core.NestedIOException;
+import org.springframework.core.log.LogAccessor;
+import org.springframework.lang.Nullable;
+import org.springframework.util.ResourceUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,55 +31,46 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
-import org.springframework.core.NestedIOException;
-import org.springframework.core.log.LogAccessor;
-import org.springframework.lang.Nullable;
-import org.springframework.util.ResourceUtils;
-
 /**
- * Convenience base class for {@link Resource} implementations,
- * pre-implementing typical behavior.
+ * Resource接口的默认抽象实现,它实现了Resource接口的大部分的公共实现
  *
- * <p>The "exists" method will check whether a File or InputStream can
- * be opened; "isOpen" will always return false; "getURL" and "getFile"
- * throw an exception; and "toString" will return the description.
+ * <p>如果我们想要实现自定义的Resource,记住不要实现Resource接口,
+ * 应该继承AbstractResource抽象类,然后根据当前的具体资源特性覆盖相应的方法即可
  *
- * @author Juergen Hoeller
- * @author Sam Brannen
- * @since 28.12.2003
+ * @author gaoteng
+ * @create 2019-07-08 13:23
  */
 public abstract class AbstractResource implements Resource {
 
 	private static final LogAccessor logAccessor = new LogAccessor(AbstractResource.class);
 
 	/**
-	 * This implementation checks whether a File can be opened,
-	 * falling back to whether an InputStream can be opened.
-	 * This will cover both directories and content resources.
+	 * 判断资源是否存在,若判断过程产生异常(因为会调用SecurityManager来判断)就关闭对应的流
+	 *
+	 * @return
 	 */
 	@Override
 	public boolean exists() {
-		// Try file existence: can we find the file in the file system?
 		try {
-			return getFile().exists();
-		}
-		catch (IOException ex) {
-			// Fall back to stream existence: can we open the stream?
+			// 基于File进行判断
+			boolean exists = getFile().exists();
+			return exists;
+		} catch (IOException ex) {
 			try {
+				// 基于InputStream进行判断
 				getInputStream().close();
 				return true;
-			}
-			catch (Throwable isEx) {
-				logAccessor.debug(ex,
-						() -> "Could not close InputStream for resource: " + getDescription());
+			} catch (Throwable isEx) {
+				logAccessor.debug(ex, () -> "Could not close InputStream for resource: " + getDescription());
 				return false;
 			}
 		}
 	}
 
 	/**
-	 * This implementation always returns {@code true} for a resource
-	 * that {@link #exists() exists} (revised as of 5.1).
+	 * 根据exists方法返回值来判断是否可读,返回true表示可读,返回false表示不可读
+	 *
+	 * @return
 	 */
 	@Override
 	public boolean isReadable() {
@@ -82,7 +78,9 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation always returns {@code false}.
+	 * 资源是否打开,直接返回false表示未打开
+	 *
+	 * @return
 	 */
 	@Override
 	public boolean isOpen() {
@@ -90,7 +88,9 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation always returns {@code false}.
+	 * 是否是文件,直接返回false表示不是文件
+	 *
+	 * @return
 	 */
 	@Override
 	public boolean isFile() {
@@ -98,8 +98,10 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation throws a FileNotFoundException, assuming
-	 * that the resource cannot be resolved to a URL.
+	 * 直接抛出异常让子类实现
+	 *
+	 * @return
+	 * @throws IOException
 	 */
 	@Override
 	public URL getURL() throws IOException {
@@ -107,23 +109,26 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation builds a URI based on the URL returned
-	 * by {@link #getURL()}.
+	 * 基于getURL()返回的URL构建URI
+	 *
+	 * @return
+	 * @throws IOException
 	 */
 	@Override
 	public URI getURI() throws IOException {
 		URL url = getURL();
 		try {
 			return ResourceUtils.toURI(url);
-		}
-		catch (URISyntaxException ex) {
+		} catch (URISyntaxException ex) {
 			throw new NestedIOException("Invalid URI [" + url + "]", ex);
 		}
 	}
 
 	/**
-	 * This implementation throws a FileNotFoundException, assuming
-	 * that the resource cannot be resolved to an absolute file path.
+	 * 直接抛出异常让子类实现
+	 *
+	 * @return
+	 * @throws IOException
 	 */
 	@Override
 	public File getFile() throws IOException {
@@ -131,10 +136,10 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation returns {@link Channels#newChannel(InputStream)}
-	 * with the result of {@link #getInputStream()}.
-	 * <p>This is the same as in {@link Resource}'s corresponding default method
-	 * but mirrored here for efficient JVM-level dispatching in a class hierarchy.
+	 * 根据getInputStream()的返回结果构建ReadableByteChannel
+	 *
+	 * @return
+	 * @throws IOException
 	 */
 	@Override
 	public ReadableByteChannel readableChannel() throws IOException {
@@ -142,10 +147,10 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation reads the entire InputStream to calculate the
-	 * content length. Subclasses will almost always be able to provide
-	 * a more optimal version of this, e.g. checking a File length.
-	 * @see #getInputStream()
+	 * 获取资源内容的长度,这个资源内容长度实际就是资源的字节长度，通过全部读取一遍来判断
+	 *
+	 * @return
+	 * @throws IOException
 	 */
 	@Override
 	public long contentLength() throws IOException {
@@ -158,22 +163,20 @@ public abstract class AbstractResource implements Resource {
 				size += read;
 			}
 			return size;
-		}
-		finally {
+		} finally {
 			try {
 				is.close();
-			}
-			catch (IOException ex) {
-				logAccessor.debug(ex,
-						() -> "Could not close InputStream for resource: " + getDescription());
+			} catch (IOException ex) {
+				logAccessor.debug(ex, () -> "Could not close InputStream for resource: " + getDescription());
 			}
 		}
 	}
 
 	/**
-	 * This implementation checks the timestamp of the underlying File,
-	 * if available.
-	 * @see #getFileForLastModifiedCheck()
+	 * 返回资源最后的修改时间
+	 *
+	 * @return
+	 * @throws IOException
 	 */
 	@Override
 	public long lastModified() throws IOException {
@@ -186,21 +189,16 @@ public abstract class AbstractResource implements Resource {
 		return lastModified;
 	}
 
-	/**
-	 * Determine the File to use for timestamp checking.
-	 * <p>The default implementation delegates to {@link #getFile()}.
-	 * @return the File to use for timestamp checking (never {@code null})
-	 * @throws FileNotFoundException if the resource cannot be resolved as
-	 * an absolute file path, i.e. is not available in a file system
-	 * @throws IOException in case of general resolution/reading failures
-	 */
 	protected File getFileForLastModifiedCheck() throws IOException {
 		return getFile();
 	}
 
 	/**
-	 * This implementation throws a FileNotFoundException, assuming
-	 * that relative resources cannot be created for this resource.
+	 * 直接抛出异常让子类实现
+	 *
+	 * @param relativePath
+	 * @return
+	 * @throws IOException
 	 */
 	@Override
 	public Resource createRelative(String relativePath) throws IOException {
@@ -208,8 +206,9 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation always returns {@code null},
-	 * assuming that this resource type does not have a filename.
+	 * 获取资源名称,默认返回null,交给子类实现
+	 *
+	 * @return
 	 */
 	@Override
 	@Nullable
@@ -217,29 +216,21 @@ public abstract class AbstractResource implements Resource {
 		return null;
 	}
 
-
-	/**
-	 * This implementation compares description strings.
-	 * @see #getDescription()
-	 */
 	@Override
 	public boolean equals(@Nullable Object other) {
 		return (this == other || (other instanceof Resource &&
 				((Resource) other).getDescription().equals(getDescription())));
 	}
 
-	/**
-	 * This implementation returns the description's hash code.
-	 * @see #getDescription()
-	 */
 	@Override
 	public int hashCode() {
 		return getDescription().hashCode();
 	}
 
 	/**
-	 * This implementation returns the description of this resource.
-	 * @see #getDescription()
+	 * 返回资源的描述
+	 *
+	 * @return
 	 */
 	@Override
 	public String toString() {

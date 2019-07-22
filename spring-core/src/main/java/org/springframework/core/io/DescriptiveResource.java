@@ -23,28 +23,19 @@ import java.io.InputStream;
 import org.springframework.lang.Nullable;
 
 /**
- * Simple {@link Resource} implementation that holds a resource description
- * but does not point to an actually readable resource.
+ * 资源描述Resource,不指向具体的资源,只作资源描述
  *
- * <p>To be used as placeholder if a {@code Resource} argument is
- * expected by an API but not necessarily used for actual reading.
- *
- * @author Juergen Hoeller
- * @since 1.2.6
+ * @author gaoteng
+ * @create 2019-07-08 13:23
  */
 public class DescriptiveResource extends AbstractResource {
 
 	private final String description;
 
 
-	/**
-	 * Create a new DescriptiveResource.
-	 * @param description the resource description
-	 */
 	public DescriptiveResource(@Nullable String description) {
 		this.description = (description != null ? description : "");
 	}
-
 
 	@Override
 	public boolean exists() {
@@ -67,19 +58,12 @@ public class DescriptiveResource extends AbstractResource {
 		return this.description;
 	}
 
-
-	/**
-	 * This implementation compares the underlying description String.
-	 */
 	@Override
 	public boolean equals(@Nullable Object other) {
 		return (this == other || (other instanceof DescriptiveResource &&
 				((DescriptiveResource) other).description.equals(this.description)));
 	}
 
-	/**
-	 * This implementation returns the hash code of the underlying description String.
-	 */
 	@Override
 	public int hashCode() {
 		return this.description.hashCode();

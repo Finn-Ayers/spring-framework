@@ -30,18 +30,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ResourceUtils;
 
 /**
- * Subclass of {@link UrlResource} which assumes file resolution, to the degree
- * of implementing the {@link WritableResource} interface for it. This resource
- * variant also caches resolved {@link File} handles from {@link #getFile()}.
+ * UrlResource的子类,文件Url资源的实现
  *
- * <p>This is the class resolved by {@link DefaultResourceLoader} for a "file:..."
- * URL location, allowing a downcast to {@link WritableResource} for it.
- *
- * <p>Alternatively, for direct construction from a {@link java.io.File} handle
- * or NIO {@link java.nio.file.Path}, consider using {@link FileSystemResource}.
- *
- * @author Juergen Hoeller
- * @since 5.0.2
+ * @author gaoteng
+ * @create 2019-07-08 13:23
  */
 public class FileUrlResource extends UrlResource implements WritableResource {
 
@@ -49,31 +41,19 @@ public class FileUrlResource extends UrlResource implements WritableResource {
 	private volatile File file;
 
 
-	/**
-	 * Create a new {@code FileUrlResource} based on the given URL object.
-	 * <p>Note that this does not enforce "file" as URL protocol. If a protocol
-	 * is known to be resolvable to a file,
-	 * @param url a URL
-	 * @see ResourceUtils#isFileURL(URL)
-	 * @see #getFile()
-	 */
 	public FileUrlResource(URL url) {
 		super(url);
 	}
 
 	/**
-	 * Create a new {@code FileUrlResource} based on the given file location,
-	 * using the URL protocol "file".
-	 * <p>The given parts will automatically get encoded if necessary.
-	 * @param location the location (i.e. the file path within that protocol)
-	 * @throws MalformedURLException if the given URL specification is not valid
-	 * @see UrlResource#UrlResource(String, String)
-	 * @see ResourceUtils#URL_PROTOCOL_FILE
+	 * 根据本地路径构建
+	 *
+	 * @param location
+	 * @throws MalformedURLException
 	 */
 	public FileUrlResource(String location) throws MalformedURLException {
 		super(ResourceUtils.URL_PROTOCOL_FILE, location);
 	}
-
 
 	@Override
 	public File getFile() throws IOException {
@@ -94,12 +74,10 @@ public class FileUrlResource extends UrlResource implements WritableResource {
 				// Proceed with file system resolution
 				File file = getFile();
 				return (file.canWrite() && !file.isDirectory());
-			}
-			else {
+			} else {
 				return true;
 			}
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			return false;
 		}
 	}

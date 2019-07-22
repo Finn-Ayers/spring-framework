@@ -16,29 +16,21 @@
 
 package org.springframework.core.io;
 
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-
 /**
- * {@link Resource} implementation for a given byte array.
- * <p>Creates a {@link ByteArrayInputStream} for the given byte array.
+ * 对字节数组提供的数据的封装Resource,如果通过InputStream形式访问该类型的资源,
  *
- * <p>Useful for loading content from any given byte array,
- * without having to resort to a single-use {@link InputStreamResource}.
- * Particularly useful for creating mail attachments from local content,
- * where JavaMail needs to be able to read the stream multiple times.
+ * <p>该实现会根据字节数组的数据构造一个相应的 ByteArrayInputStream
  *
- * @author Juergen Hoeller
- * @author Sam Brannen
- * @since 1.2.3
- * @see java.io.ByteArrayInputStream
- * @see InputStreamResource
- * @see org.springframework.mail.javamail.MimeMessageHelper#addAttachment(String, InputStreamSource)
+ * @author gaoteng
+ * @create 2019-07-08 13:23
  */
 public class ByteArrayResource extends AbstractResource {
 
@@ -48,17 +40,19 @@ public class ByteArrayResource extends AbstractResource {
 
 
 	/**
-	 * Create a new {@code ByteArrayResource}.
-	 * @param byteArray the byte array to wrap
+	 * 根据byte数组构建
+	 *
+	 * @param byteArray
 	 */
 	public ByteArrayResource(byte[] byteArray) {
 		this(byteArray, "resource loaded from byte array");
 	}
 
 	/**
-	 * Create a new {@code ByteArrayResource} with a description.
-	 * @param byteArray the byte array to wrap
-	 * @param description where the byte array comes from
+	 * 根据byte数组、description构建
+	 *
+	 * @param byteArray
+	 * @param description
 	 */
 	public ByteArrayResource(byte[] byteArray, @Nullable String description) {
 		Assert.notNull(byteArray, "Byte array must not be null");
@@ -66,16 +60,19 @@ public class ByteArrayResource extends AbstractResource {
 		this.description = (description != null ? description : "");
 	}
 
-
 	/**
-	 * Return the underlying byte array.
+	 * 获取byte数组
+	 *
+	 * @return
 	 */
 	public final byte[] getByteArray() {
 		return this.byteArray;
 	}
 
 	/**
-	 * This implementation always returns {@code true}.
+	 * 是否存在,默认为true表示存在
+	 *
+	 * @return
 	 */
 	@Override
 	public boolean exists() {
@@ -83,7 +80,9 @@ public class ByteArrayResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation returns the length of the underlying byte array.
+	 * 内容长度,返回byte数组长度
+	 *
+	 * @return
 	 */
 	@Override
 	public long contentLength() {
@@ -91,9 +90,10 @@ public class ByteArrayResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation returns a ByteArrayInputStream for the
-	 * underlying byte array.
-	 * @see java.io.ByteArrayInputStream
+	 * 获取InputStream
+	 *
+	 * @return
+	 * @throws IOException
 	 */
 	@Override
 	public InputStream getInputStream() throws IOException {
@@ -101,29 +101,21 @@ public class ByteArrayResource extends AbstractResource {
 	}
 
 	/**
-	 * This implementation returns a description that includes the passed-in
-	 * {@code description}, if any.
+	 * 获取资源描述,描述由构造器传入
+	 *
+	 * @return
 	 */
 	@Override
 	public String getDescription() {
 		return "Byte array resource [" + this.description + "]";
 	}
 
-
-	/**
-	 * This implementation compares the underlying byte array.
-	 * @see java.util.Arrays#equals(byte[], byte[])
-	 */
 	@Override
 	public boolean equals(@Nullable Object other) {
 		return (this == other || (other instanceof ByteArrayResource &&
 				Arrays.equals(((ByteArrayResource) other).byteArray, this.byteArray)));
 	}
 
-	/**
-	 * This implementation returns the hash code based on the
-	 * underlying byte array.
-	 */
 	@Override
 	public int hashCode() {
 		return (byte[].class.hashCode() * 29 * this.byteArray.length);
