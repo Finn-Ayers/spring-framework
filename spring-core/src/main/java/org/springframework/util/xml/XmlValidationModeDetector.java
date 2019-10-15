@@ -152,10 +152,10 @@ public class XmlValidationModeDetector {
 	}
 
 	/**
-	 * Consumes all the leading comment data in the given String and returns the remaining content, which
-	 * may be empty since the supplied content might be all comment data. For our purposes it is only important
-	 * to strip leading comment content on a line since the first piece of non comment content will be either
-	 * the DOCTYPE declaration or the root element of the document.
+	 * 内容是否是注释
+	 *
+	 * @param line
+	 * @return
 	 */
 	@Nullable
 	private String consumeCommentTokens(String line) {

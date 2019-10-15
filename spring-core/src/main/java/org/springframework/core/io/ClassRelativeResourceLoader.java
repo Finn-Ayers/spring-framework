@@ -20,13 +20,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link ResourceLoader} implementation that interprets plain resource paths
- * as relative to a given {@code java.lang.Class}.
+ * DefaultResourceLoader 的另一个子类的实现。和 FileSystemResourceLoader 类似
+ * <p>
+ * 扩展的功能是可以根据给定的class所在包或者所在包的子包下加载资源。
  *
  * @author Juergen Hoeller
- * @since 3.0
- * @see Class#getResource(String)
- * @see ClassPathResource#ClassPathResource(String, Class)
  */
 public class ClassRelativeResourceLoader extends DefaultResourceLoader {
 
@@ -35,6 +33,7 @@ public class ClassRelativeResourceLoader extends DefaultResourceLoader {
 
 	/**
 	 * Create a new ClassRelativeResourceLoader for the given class.
+	 *
 	 * @param clazz the class to load resources through
 	 */
 	public ClassRelativeResourceLoader(Class<?> clazz) {

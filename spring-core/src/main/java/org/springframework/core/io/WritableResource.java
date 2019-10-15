@@ -22,7 +22,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
 /**
- * 继承自Resource,表示一个可写的资源
+ * 继承自Resource,表示一个可写的资源,file相关的resource类实现此接口
  *
  * @author gaoteng
  * @create 2019-07-08 14:23

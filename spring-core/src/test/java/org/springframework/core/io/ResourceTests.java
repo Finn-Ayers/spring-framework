@@ -123,7 +123,7 @@ public class ResourceTests {
 	@Test
 	public void testFileSystemResource() throws IOException {
 		String file = getClass().getResource("Resource.class").getFile();
-		Resource resource = new FileSystemResource(file);
+		Resource resource = new FileUrlResource(file);
 		doTestResource(resource);
 		assertThat(resource).isEqualTo(new FileSystemResource(file));
 	}
