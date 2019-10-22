@@ -208,6 +208,7 @@ abstract public class KeyFactory {
 			return keyInterface.getClassLoader();
 		}
 
+		@Override
 		protected ProtectionDomain getProtectionDomain() {
 			return ReflectUtils.getProtectionDomain(keyInterface);
 		}

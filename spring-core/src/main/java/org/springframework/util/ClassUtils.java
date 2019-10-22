@@ -937,6 +937,7 @@ public abstract class ClassUtils {
 				(typeName.equals(clazz.getTypeName()) || typeName.equals(clazz.getSimpleName())));
 	}
 
+
 	/**
 	 * Get the class name without the qualified package name.
 	 * @param className the className to get the short name for

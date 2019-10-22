@@ -594,6 +594,7 @@ public class Enhancer extends AbstractClassGenerator {
 		}
 	}
 
+	@Override
 	protected ProtectionDomain getProtectionDomain() {
 		if (superclass != null) {
 			return ReflectUtils.getProtectionDomain(superclass);

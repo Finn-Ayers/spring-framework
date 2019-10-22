@@ -294,7 +294,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			logger.trace("Loading XML bean definitions from " + encodedResource);
 		}
 
-		// 获取已经加载过的资源
+		// 1.使用ThreadLocal防止资源文件循环加载
 		Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
 		if (currentResources == null) {
 			currentResources = new HashSet<>(4);
@@ -405,8 +405,13 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @throws Exception
 	 */
 	protected Document doLoadDocument(InputSource inputSource, Resource resource) throws Exception {
-		return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler,
-				getValidationModeForResource(resource), isNamespaceAware());
+		return this.documentLoader.loadDocument(
+				inputSource,
+				getEntityResolver(),
+				this.errorHandler,
+				getValidationModeForResource(resource),
+				isNamespaceAware()
+		);
 	}
 
 	/**
