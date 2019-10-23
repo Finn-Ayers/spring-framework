@@ -106,8 +106,10 @@ class BeanDefinitionValueResolver {
 	 */
 	@Nullable
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
-		// We must check each value to see whether it requires a runtime reference
-		// to another bean to be resolved.
+
+		// 判断RuntimeBeanReference属性
+		// 例如BeanA依赖BeanB,那么在配置文件中有通过配置ref标签进行引用的,在解析BeanDefinition的时候
+		// 是不会直接实例化BeanB的,那么这个引用就是RuntimeBeanReference
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
 			return resolveReference(argName, ref);
@@ -296,7 +298,7 @@ class BeanDefinitionValueResolver {
 	}
 
 	/**
-	 * Resolve a reference to another bean in the factory.
+	 * 解析RuntimeBeanReference（运行时引用）
 	 */
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
@@ -307,9 +309,9 @@ class BeanDefinitionValueResolver {
 				BeanFactory parent = this.beanFactory.getParentBeanFactory();
 				if (parent == null) {
 					throw new BeanCreationException(
-							this.beanDefinition.getResourceDescription(), this.beanName,
-							"Cannot resolve reference to bean " + ref +
-									" in parent factory: no parent factory available");
+							this.beanDefinition.getResourceDescription(),
+							this.beanName,
+							"Cannot resolve reference to bean " + ref +" in parent factory: no parent factory available");
 				}
 				if (beanType != null) {
 					bean = parent.getBean(beanType);
