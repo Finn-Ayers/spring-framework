@@ -1,14 +1,11 @@
 package org.springframework.beans;
 
 import org.junit.Test;
-import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.tests.sample.beans.TestBean;
 
 /**
  * copyright (C), 2015-2019, 深圳市点购电子商务控股有限公司广州分公司
@@ -32,6 +29,7 @@ public class BeanLoadTests {
 
 		// 创建XML读取器,用于读取并解析Spring Xml配置文件
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+		// beanDefinitionReader.setEntityResolver(new TestEntityResolver());
 
 		// 资源读取器
 		FileSystemResourceLoader resourceLoader = new FileSystemResourceLoader();
@@ -41,10 +39,10 @@ public class BeanLoadTests {
 		int registerNum = beanDefinitionReader.loadBeanDefinitions(resource);
 
 		// 从IOC容器中获取注册的Bean
-		// BeanDefinition beanDefinition = beanDefinitionReader.getRegistry().getBeanDefinition("test3");
+		BeanDefinition beanDefinition = beanDefinitionReader.getRegistry().getBeanDefinition("customizeTest");
 
-		Object circularA = beanFactory.getBean("circularA");
-		Object circularB = beanFactory.getBean("circularB");
+		Object circularA = beanFactory.getBean("customizeTest");
+//		Object circularB = beanFactory.getBean("circularB");
 
 		System.out.println("注册数: " + registerNum);
 	}

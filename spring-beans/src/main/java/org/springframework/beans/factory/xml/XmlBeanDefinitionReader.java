@@ -70,7 +70,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	private boolean namespaceAware = false;
 
 	/**
-	 * 默认Document文档读取器
+	 * 默认Document文档读取器,定义读取Document并注册到BeanDefinition功能
 	 */
 	private Class<? extends BeanDefinitionDocumentReader> documentReaderClass = DefaultBeanDefinitionDocumentReader.class;
 
@@ -84,7 +84,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	private NamespaceHandlerResolver namespaceHandlerResolver;
 
 	/**
-	 * Document 加载器
+	 * 定义从资源文件加载到转换为Document的功能
 	 */
 	private DocumentLoader documentLoader = new DefaultDocumentLoader();
 

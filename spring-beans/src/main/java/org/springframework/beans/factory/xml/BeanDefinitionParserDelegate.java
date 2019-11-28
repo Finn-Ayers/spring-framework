@@ -411,9 +411,12 @@ public class BeanDefinitionParserDelegate {
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
 
+		// 解析id
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		// 解析别名
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
+		// 解析别名
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);

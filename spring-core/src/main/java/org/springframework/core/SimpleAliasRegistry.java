@@ -30,7 +30,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
 /**
- * 注册alias和beanName的映射
+ * 注册alias和beanName的映射,使用map作为缓存
  *
  * @author Juergen Hoeller
  * @since 2.5.2

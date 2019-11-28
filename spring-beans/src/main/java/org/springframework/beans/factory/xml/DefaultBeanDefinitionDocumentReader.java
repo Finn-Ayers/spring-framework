@@ -40,7 +40,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * 默认BeanDefinition文档读取器
+ * 默认BeanDefinition文档读取器,提供读取Document并注册BeanDefinition功能
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
