@@ -38,11 +38,13 @@ public class BeanLoadTests {
 		// 加载并注册Bean Definition到IOC容器
 		int registerNum = beanDefinitionReader.loadBeanDefinitions(resource);
 
-		// 从IOC容器中获取注册的Bean
-		BeanDefinition beanDefinition = beanDefinitionReader.getRegistry().getBeanDefinition("customizeTest");
 
-		Object circularA = beanFactory.getBean("customizeTest");
-//		Object circularB = beanFactory.getBean("circularB");
+
+		// 从IOC容器中获取注册的Bean
+		BeanDefinition beanDefinition = beanDefinitionReader.getRegistry().getBeanDefinition("circularA");
+
+		Object circularA = beanFactory.getBean("circularA");
+		Object circularB = beanFactory.getBean("circularB");
 
 		System.out.println("注册数: " + registerNum);
 	}
