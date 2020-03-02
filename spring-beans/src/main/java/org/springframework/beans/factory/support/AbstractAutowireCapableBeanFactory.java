@@ -1191,7 +1191,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		// Candidate constructors for autowiring?
+		// 构造函数实例化对象
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
@@ -1733,7 +1733,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Set our (possibly massaged) deep copy.
 		try {
-			bw.setPropertyValues(new MutablePropertyValues(deepCopy));
+			bw.setPropertyValues(new MutablePropertyValues(deepCopy
+
+
+			));
 		} catch (BeansException ex) {
 			throw new BeanCreationException(
 					mbd.getResourceDescription(), beanName, "Error setting property values", ex);

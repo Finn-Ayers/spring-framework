@@ -39,7 +39,6 @@ public class BeanLoadTests {
 		int registerNum = beanDefinitionReader.loadBeanDefinitions(resource);
 
 
-
 		// 从IOC容器中获取注册的Bean
 		BeanDefinition beanDefinition = beanDefinitionReader.getRegistry().getBeanDefinition("circularA");
 
