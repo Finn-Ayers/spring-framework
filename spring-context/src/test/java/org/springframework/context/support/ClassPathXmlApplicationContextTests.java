@@ -58,6 +58,7 @@ public class ClassPathXmlApplicationContextTests {
 	private static final String CONTEXT_WILDCARD = PATH + "test/context*.xml";
 	private static final String CONTEXT_A = "test/contextA.xml";
 	private static final String CONTEXT_B = "test/contextB.xml";
+	
 	private static final String CONTEXT_C = "test/contextC.xml";
 	private static final String FQ_CONTEXT_A = PATH + CONTEXT_A;
 	private static final String FQ_CONTEXT_B = PATH + CONTEXT_B;
